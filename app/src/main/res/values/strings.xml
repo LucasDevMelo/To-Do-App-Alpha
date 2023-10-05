@@ -1,4 +1,4 @@
- <resources>
+<resources>
     <string name="app_name">To-Do-App</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -9,4 +9,5 @@
     <string name="already_registered">Já registrado ? </string>
     <string name="sign_in">Entrar</string>
     <string name="not_registered">Não cadastrado?</string>
+    <string name="type_your_task">Digite sua tarefa</string>
 </resources>

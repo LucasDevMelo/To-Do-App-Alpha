@@ -52,18 +52,24 @@ class SignUpFragment : Fragment() {
 
             if (email.isNotEmpty() && pass.isNotEmpty() && verifyPass.isNotEmpty()){
                 if (pass == verifyPass){
+                    binding.progressBar.visibility = View.VISIBLE
                     auth.createUserWithEmailAndPassword(email , pass).addOnCompleteListener(
                         OnCompleteListener {
                             if (it.isSuccessful){
                                 Toast.makeText(context , "Registro realizado com sucesso", Toast.LENGTH_SHORT).show()
                                 navControl.navigate(R.id.action_signUpFragment_to_homeFragment)
                             } else {
-                                Toast.makeText(context , it.exception?.message, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, it.exception?.message, Toast.LENGTH_SHORT)
+                                    .show()
                             }
-                        }
-                    )
+                            binding.progressBar.visibility = View.VISIBLE
+                        })
                 }
+            } else {
+                Toast.makeText(context, "As senhas não coincidem!", Toast.LENGTH_SHORT)
+                    .show()
             }
+            binding.progressBar.visibility = View.VISIBLE
         }
     }
 }
