@@ -24,7 +24,7 @@ class HomeFragment : Fragment(), AddToDoPopUpFragment.DialogNextBtnClickListener
     private lateinit var databaseRef: DatabaseReference
     private lateinit var navController: NavController
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var popUpFragment : AddToDoPopUpFragment
+    private var popUpFragment : AddToDoPopUpFragment? = null
     private lateinit var adapter: ToDoAdapter
     private lateinit var mList: MutableList<ToDoData>
 
@@ -47,11 +47,13 @@ class HomeFragment : Fragment(), AddToDoPopUpFragment.DialogNextBtnClickListener
 
     private fun registerEvents(){
         binding.addBtnHome.setOnClickListener {
+            if(popUpFragment != null)
+                childFragmentManager.beginTransaction().remove(popUpFragment!!).commit()
             popUpFragment = AddToDoPopUpFragment()
-            popUpFragment.setListener(this)
-            popUpFragment.show(
+            popUpFragment!!.setListener(this)
+            popUpFragment!!.show(
                 childFragmentManager,
-                "AddToDoPopUpFragment"
+                AddToDoPopUpFragment.TAG
             )
         }
     }
@@ -97,13 +99,26 @@ class HomeFragment : Fragment(), AddToDoPopUpFragment.DialogNextBtnClickListener
         databaseRef.push().setValue(todo).addOnCompleteListener {
             if (it.isSuccessful){
                 Toast.makeText(context , "Tarefa salva com sucesso !!" , Toast.LENGTH_SHORT).show()
-                todoEt.text = null
             } else {
                 Toast.makeText(context , it.exception?.message , Toast.LENGTH_SHORT).show()
             }
-
-            popUpFragment.dismiss()
+            todoEt.text = null
+            popUpFragment!!.dismiss()
         }
+    }
+
+    override fun onUpdateTask(toDoData: ToDoData, todoEt: TextInputEditText) {
+        val map = HashMap<String,Any>()
+            map[toDoData.taskId] = toDoData.task
+            databaseRef.updateChildren(map).addOnCompleteListener {
+                if (it.isSuccessful){
+                    Toast.makeText(context , "Tarefa atualizada com sucesso!" , Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context , it.exception?.message , Toast.LENGTH_SHORT).show()
+                }
+                todoEt.text = null
+                popUpFragment!!.dismiss()
+            }
     }
 
     override fun onDeleteBtnClicked(toDoData: ToDoData) {
@@ -117,7 +132,13 @@ class HomeFragment : Fragment(), AddToDoPopUpFragment.DialogNextBtnClickListener
     }
 
     override fun onEditTaskBtnClicked(toDoData: ToDoData) {
-        TODO("Not yet implemented")
+        if (popUpFragment != null)
+            childFragmentManager.beginTransaction().remove(popUpFragment!!).commit()
+
+        popUpFragment = AddToDoPopUpFragment.newInstance(toDoData.taskId , toDoData.task)
+        popUpFragment!!.setListener(this)
+        popUpFragment!!.show(childFragmentManager, AddToDoPopUpFragment.TAG)
+
     }
 
 }
